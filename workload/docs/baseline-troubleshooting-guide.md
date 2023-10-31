@@ -55,6 +55,23 @@ After successful deployment and enabling FSLogix, if users' containers are not b
     - Verify that Private DNS Zones are correctly configured to the Identity Services virtual network.
     - If using custom DNS, conditional forwarders should be configured. Verify this is correctly configured.
     - 
+### user profile failed to attach
+![image](https://github.com/Azure/avdaccelerator/assets/88662820/da7d356f-f777-402c-9012-77011f9f8e43)
+
+1. verify networkconnectivity towards the storage account 
+> - CTRL + SHIFT + ESC to open start a process 
+> - run: regedit
+> - verify if you can mount the VHD location: https://learn.microsoft.com/en-gb/azure/storage/files/storage-files-identity-auth-domain-services-enable?tabs=azure-portal#mount-the-file-share-from-a-domain-joined-vm
+2. Check logfiles on the management VM: C:\Windows\Temp\ManualDscStorageScriptsLog.log
+- if you find :
+> icacls \$\{DriveLetter\}: /grant "${Group}:(M)" failed
+- Verify if the user-group exists in your AD and if the user-account is part of this user-group
+- During the ARM-deployment we've been asked (*optionally*) to provide a user-group of avd-users. This user-group should also exists in your ADDS
+- Add user-group and assign users to this group, re-run the icacls
+```powershell
+ $Group = "avd4.local\avd4users"
+ icacls ${DriveLetter}: /grant "${Group}:(M)"
+```
 
 Other known issues:
 
